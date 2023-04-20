@@ -9,9 +9,9 @@ const serviceAccount = require("./dasp-50c3b-firebase-adminsdk-vuuw7-f85d0743c9.
 const connection = {
   host: "161.35.34.173",
   port: 3306,
-  user: "user",
-  password: "password",
-  database: "db",
+  user: "master-user01",
+  password: "T8!C3s*2&7",
+  database: "POCKET_DB",
   insecureAuth: true,
 };
 
@@ -51,9 +51,10 @@ app.post("/users/create", (req, res) => {
   const data = req.body;
   let conn = mysql.createConnection(connection);
   conn.query(
-    `INSERT INTO USERS (MAIL, PASSWORD, NAME, SURNAME, TOKEN) VALUES ('${data.mail}', '${data.pass}', '${data.name}', '${data.surname}, '${data.token}')`,
+    `INSERT INTO USERS (MAIL, PASSWORD, NAME, SURNAME, TOKEN) VALUES ('${data.mail}', '${data.pass}', '${data.name}', '${data.surname}', '${data.token}')`,
     (err, re) => {
       if (err) {
+        console.log(err);
 		    res.status(200).send({ success: false});
       } else {
         res.status(200).send({ success: true })
@@ -135,11 +136,34 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 
-const message = {
-  notification: {
-    title: "¡Toca entrenar!",
-    body: "Tu rutina es RRR",
-  },
-  token: 
-}
+app.post("/routine", (req, res) => {
+  const query = "SELECT u.TOKEN, d.ROUTINE FROM USERS u INNER JOIN DIARY d ON u.MAIL = d.MAIL WHERE d.DATE_ROUTINE = CURDATE();";
+  let conn = mysql.createConnection(connection);
+  conn.query(query, (err, re) => {
+      if (err) console.log(err);
+      else {
+        const message = {
+          notification: {
+            title: "¡Toca entrenar!",
+            body: "Tu rutina es RRR",
+          },
+          token: re[0].TOKEN
+        }
+
+        console.log(message)
+        
+        admin.messaging().send(message)
+        .then((response) => {
+          console.log('Notificación enviada:', response);
+        })
+        .catch((error) => {
+          console.log('Error al enviar la notificación:', error);
+          //TODO Hacer hasta 3 intentos por notificación para evitar errores
+        });
+
+      }
+  })
+  res.status(200).send();
+})
+
 
