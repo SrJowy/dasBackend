@@ -18,19 +18,32 @@ app.listen(5000, () => {
 app.get("/users", (req, res) => {
   const data = req.query;
   let query;
+  let token;
+  let mail;
   if (data == null) {
     query = "SELECT * FROM USERS;";
-  } else if (data.mail && data.pass) {
-    const mail = data.mail;
+  } else if (data.mail && data.pass && data.token) {
+    mail = data.mail;
     const pass = data.pass;
+    token = data.token;
     query = `SELECT * FROM USERS WHERE MAIL = '${mail}' AND PASSWORD = '${pass}';`;
   } else {
-    const mail = data.mail;
+    mail = data.mail;
     query = `SELECT * FROM USERS WHERE MAIL = '${mail}';`;
   }
   let conn = mysql.createConnection(connection);
   conn.query(query, (err, re) => {
-    if (err) console.log(err);
+    if (err) {
+      console.log(err);
+    } else if (re.length !== 0 && token) {
+      const user = re[0];
+      if (user.TOKEN !== token) {
+        query = `UPDATE USERS SET TOKEN = '${token}' WHERE MAIL = '${mail}'`
+        conn.query(query, (err, re) => {
+          if (err) console.log(err);
+        })
+      }
+    }
     res.status(200).send({ result: re });
   });
   conn.end;
@@ -119,7 +132,7 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 
-app.post("/routine", (req, res) => {
+app.post("/routine/firebase", (req, res) => {
   const query =
     "SELECT u.TOKEN, d.ROUTINE FROM USERS u INNER JOIN DIARY d ON u.MAIL = d.MAIL WHERE d.DATE_ROUTINE = CURDATE();";
   let conn = mysql.createConnection(connection);
