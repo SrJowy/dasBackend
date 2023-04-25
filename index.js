@@ -161,6 +161,7 @@ app.post("/routine/firebase", (req, res) => {
       }
     }
   });
+  conn.end;
   res.status(200).send();
 });
 
