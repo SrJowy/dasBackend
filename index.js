@@ -337,4 +337,5 @@ app.post("/image", (req, res) => {
   conn.end();
 });
 
-//0 10 * * * curl -XPOST http://localhost:puerto/routine >/dev/null 2>&1
+// Cron task that sends a HTTP request and executes the firebase service everyday at 10 am
+//0 10 * * * curl -XPOST http://localhost:3000/routine/firebase >/dev/null 2>&1
