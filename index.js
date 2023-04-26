@@ -38,15 +38,15 @@ app.get("/users", (req, res) => {
     } else if (re.length !== 0 && token) {
       const user = re[0];
       if (user.TOKEN !== token) {
-        query = `UPDATE USERS SET TOKEN = '${token}' WHERE MAIL = '${mail}'`
+        query = `UPDATE USERS SET TOKEN = '${token}' WHERE MAIL = '${mail}'`;
         conn.query(query, (err, re) => {
           if (err) console.log(err);
-        })
+        });
       }
     }
     res.status(200).send({ result: re });
   });
-  conn.end;
+  conn.end();
 });
 
 app.post("/users/create", (req, res) => {
@@ -63,7 +63,7 @@ app.post("/users/create", (req, res) => {
       }
     }
   );
-  conn.end;
+  conn.end();
 });
 
 app.post("/diary/create", (req, res) => {
@@ -78,7 +78,7 @@ app.post("/diary/create", (req, res) => {
       res.status(200).send({ success: true });
     }
   });
-  conn.end;
+  conn.end();
 });
 
 app.get("/diary", (req, res) => {
@@ -104,7 +104,7 @@ app.get("/diary", (req, res) => {
     if (err) console.log(err);
     res.status(200).send({ result: re });
   });
-  conn.end;
+  conn.end();
 });
 
 app.delete("/diary", (req, res) => {
@@ -125,7 +125,7 @@ app.delete("/diary", (req, res) => {
       res.status(200).send({ success: true });
     }
   });
-  conn.end;
+  conn.end();
 });
 
 admin.initializeApp({
@@ -159,25 +159,26 @@ app.post("/routine/firebase", (req, res) => {
             console.log("Error al enviar la notificación:", error);
           });
       }
+      res.status(200).send();
     }
   });
-  conn.end;
-  res.status(200).send();
+  conn.end();
 });
 
 app.post("/routine/create", (req, res) => {
   const data = req.body;
   let conn = mysql.createConnection(connection);
   const query = `INSERT INTO ROUTINES (MAIL, NAME, DESCRIP) VALUES ('${data.mail}', '${data.routine_name}', '${data.routine_desc}');`;
-  conn.query(query, (err, re) => {
-    if (err) {
-      console.log(err);
-      res.status(200).send({ success: false });
-    } else {
-      res.status(200).send({ success: true });
-    }
-  });
-  conn.end;
+  conn
+    .query(query, (err, re) => {
+      if (err) {
+        console.log(err);
+        res.status(200).send({ success: false });
+      } else {
+        res.status(200).send({ success: true });
+      }
+    })
+    .then(() => conn.end());
 });
 
 app.get("/routine", (req, res) => {
@@ -194,7 +195,7 @@ app.get("/routine", (req, res) => {
     if (err) console.log(err);
     res.status(200).send({ result: re });
   });
-  conn.end;
+  conn.end();
 });
 
 app.post("/routine-ex/create", (req, res) => {
@@ -209,7 +210,7 @@ app.post("/routine-ex/create", (req, res) => {
       res.status(200).send({ success: true });
     }
   });
-  conn.end;
+  conn.end();
 });
 
 app.post("/exercise", (req, res) => {
@@ -235,7 +236,7 @@ app.post("/exercise", (req, res) => {
     if (err) console.log(err);
     res.status(200).send({ result: re });
   });
-  conn.end;
+  conn.end();
 });
 
 app.delete("/routine-ex", (req, res) => {
@@ -255,7 +256,7 @@ app.delete("/routine-ex", (req, res) => {
       res.status(200).send({ success: true });
     }
   });
-  conn.end;
+  conn.end();
 });
 
 app.delete("/routine", (req, res) => {
@@ -274,7 +275,7 @@ app.delete("/routine", (req, res) => {
       res.status(200).send({ success: true });
     }
   });
-  conn.end;
+  conn.end();
 });
 
 app.post("/image/create", (req, res) => {
@@ -299,7 +300,7 @@ app.post("/image/create", (req, res) => {
         if (err) console.log(err);
         res.status(200).send({ success: true });
       });
-      conn2.end;
+      conn2.end();
     } else {
       query = `INSERT INTO IMAGES VALUES('${mail}', ${exID}, '${image}');`;
       conn.query(query, (err, re) => {
@@ -308,7 +309,7 @@ app.post("/image/create", (req, res) => {
       });
     }
   });
-  conn.end;
+  conn.end();
 });
 
 app.post("/image", (req, res) => {
@@ -333,7 +334,7 @@ app.post("/image", (req, res) => {
       res.status(200).send({ result: imageString });
     }
   });
-  conn.end;
+  conn.end();
 });
 
 //0 10 * * * curl -XPOST http://localhost:puerto/routine >/dev/null 2>&1
