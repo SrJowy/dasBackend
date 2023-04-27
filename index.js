@@ -177,8 +177,8 @@ app.post("/routine/create", (req, res) => {
       } else {
         res.status(200).send({ success: true });
       }
-    })
-    .then(() => conn.end());
+    });
+    conn.end();
 });
 
 app.get("/routine", (req, res) => {
